@@ -32,9 +32,9 @@ def read_ann(filename: str) -> list:
 
 
 def write_conll(filename: str):
-    if not os.path.isfile(filename + '.ann'):
+    if not os.path.isfile(filename + '.txt'):
+        print(filename + '.txt 不存在')
         return
-    print("开始处理 " + filename)
     ann_list = read_ann(filename + '.ann')
     txt = ''  # 原始文本
     with open(filename + '.txt', 'r', newline='', encoding='utf-8') as f:
@@ -45,33 +45,28 @@ def write_conll(filename: str):
         pointer = 0
         for ann in ann_list:
             for i in range(pointer, ann.begin):
-                # if txt[i].isspace(): continue
+                if txt[i].isspace(): continue
                 f.write(txt[i] + '\tO\n')
             f.write(txt[ann.begin] + '\tB-' + ann.label + '\n')
             for i in range(ann.begin + 1, ann.end):
-                # if txt[i].isspace: continue
+                if txt[i].isspace(): continue
                 f.write(txt[i] + '\tI-' + ann.label + '\n')
             pointer = ann.end
         for i in range(pointer, len(txt)):
-            # if txt[i].isspace: continue
+            if txt[i].isspace(): continue
             f.write(txt[i] + '\tO\n')
         # 最后以换行分割每个句子
         f.write('\n')
 
 
-def convert():
-    for i in range(10):
-        write_conll('000' + str(i))
-    for i in range(10, 100):
-        write_conll('00' + str(i))
-    write_conll("00" + str(471))
-    write_conll("0" + str(100))
-
-    # # 处理当前路径下的ann文件
-    # for f in os.listdir():
-    #     if os.path.isfile(f) and f[-4:]=='.ann':
-    #         write_conll(f[:-4])
+def convert(dir: str):
+    # 处理指定路径下的ann文件
+    os.chdir(dir)
+    for f in os.listdir():
+        if os.path.isfile(f) and f[-4:] == '.ann':
+            write_conll(f[:-4])
 
 
 if __name__ == '__main__':
-    convert()
+    target_path = '../'
+    convert(target_path)
